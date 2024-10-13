@@ -1,0 +1,14 @@
+rules:
+  - FW_NAME: 'ETRADE_IN'
+    ACTION:  'PERMIT'
+    SRC_HOSTNAME: 'etrade01.ra.com'
+    DEST_HOSTNAME: 'wkube01.ra.com'
+    DEST_PORTS: 4050
+    PROTOCOL: 'tcp'
+
+  - FW_NAME: 'WKUBE_IN'
+    ACTION:  'PERMIT'
+    SRC_HOSTNAME: 'wkube01.ra.com'
+    DEST_HOSTNAME: 'etrade01.ra.com'
+    DEST_PORTS: 8088
+    PROTOCOL: 'tcp'
