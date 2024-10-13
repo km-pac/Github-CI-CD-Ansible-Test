@@ -1,0 +1,18 @@
+default:
+  image: python:3.10
+  cache:
+    key: pip-cache
+    paths:
+      - ~/.cache/pip 
+  before_script:
+    - pip install ansible paramiko
+    - export ANSIBLE_CONFIG=./ansible.cfg
+
+stages:
+  - Validate FW Configuration
+  - deploy
+
+1. Validate HOSTNAMES:
+  stage: Validate FW Configuration
+  script:
+    - ansible-playbook validate-hostname-playbook.yml
