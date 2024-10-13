@@ -1,0 +1,44 @@
+---
+- name: "VALIDATE Hostname Playbook"
+  hosts: routers
+  gather_facts: no
+
+  vars_files:
+    - firewall.yml
+
+  tasks:
+    - name: Ping SOURCE HOSTNAMES
+      vyos.vyos.vyos_command:
+        commands:
+        - "sudo ping {{ rule.SRC_HOSTNAME }} -c 1"
+      loop: "{{ rules }}"
+      loop_control:
+        loop_var: rule
+      register: src_ping_result
+    
+    - name: Check if SOURCE HOSTNAME is reachable
+      assert:
+        that:
+          - "'unreachable' not in command_result.stdout | join('')"
+          - "'failure' not in command_result.stdout | join('')"
+        fail_msg: "{{ rule.SRC_HOSTNAME }} is NOT REACHABLE"
+        success_msg: "{{ rule.SRC_HOSTNAME }} is REACHABLE"
+      loop: "{{ src_ping_result.results | zip(rules) | list }}"
+      loop_control:
+        loop_var: result_rules
+      vars:
+        command_result: "{{ result_rules[0] }}" 
+        rule: "{{ result_rules[1] }}" 
+
+    # - name: Save all REACHABLE HOSTS
+    #   copy:
+    #     content: "{{ result_rules[1] | to_nice_yaml }}"
+    #     dest: thisvyosdevicetest.txt
+    #   when: 
+    #     - "'unreachable' not in result_rules[0].stdout | join('')"
+    #     - "'failure' not in result_rules[0].stdout | join('')"
+    #   loop: "{{ src_ping_result.results | zip(rules) | list }}"
+    #   loop_control:
+    #     loop_var: result_rules 
+
+ 
